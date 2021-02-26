@@ -38,10 +38,24 @@ spec:
             - name: data
               mountPath: {{ .datadir }}
           ports:
-            {{- range $key, $val := .ports }}
-            - name: {{ $key }}
-              containerPort: {{ $val }}
-            {{- end }}
+            - name: rpc
+              containerPort: {{ .ports.rpc }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .ports.metrics }}
+              protocol: TCP
+            - name: discovery-tcp
+              containerPort: {{ .ports.discovery }}
+              protocol: TCP
+              {{- if .hostPort.enabled }}
+              hostPort: {{ .ports.discovery }}
+              {{- end }}
+            - name: discovery-udp
+              containerPort: {{ .ports.discovery }}
+              protocol: UDP
+              {{- if .hostPort.enabled }}
+              hostPort: {{ .ports.discovery }}
+              {{- end }}
       volumes:
         - name: data
           persistentVolumeClaim:
