@@ -1,0 +1,51 @@
+{{- $root := . }}
+{{- with .Values }}
+{{- if .enabled }}
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $root.Release.Name }}
+  labels:
+    {{- include "geth.labels" $root | nindent 4 }}
+    app: {{ $root.Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "geth.selectorLabels" $root | nindent 6 }}
+      app: {{ $root.Release.Name }}
+  serviceName: {{ $root.Release.Name }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{- include "geth.selectorLabels" $root | nindent 8 }}
+        app: {{ $root.Release.Name }}
+    spec:
+      containers:
+        - name: geth
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          args:
+            {{- $args := concat .args (printf "--%s" .network | list) (list "--datadir" .datadir) (list "--metrics.port" .ports.metrics) (list "--http.vhosts" $root.Release.Name)}}
+            {{- toYaml $args | nindent 12 }}
+          resources: 
+            {{ toYaml .resources | indent 12 }}
+          livenessProbe:
+            {{- toYaml .livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .readinessProbe | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .datadir }}
+          ports:
+            {{- range $key, $val := .ports }}
+            - name: {{ $key }}
+              containerPort: {{ $val }}
+            {{- end }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ $root.Release.Name }}-data
+
+{{- end }}
+{{- end }}
