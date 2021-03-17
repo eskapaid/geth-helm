@@ -29,7 +29,7 @@ spec:
             {{- $args := concat .args (printf "--%s" .network | list) (list "--datadir" .datadir) (list "--metrics.port" .ports.metrics) (list "--http.vhosts" $root.Release.Name)}}
             {{- toYaml $args | nindent 12 }}
           resources: 
-            {{ toYaml .resources | indent 12 }}
+            {{- toYaml .resources | nindent 12 }}
           livenessProbe:
             {{- toYaml .livenessProbe | nindent 12 }}
           readinessProbe:
