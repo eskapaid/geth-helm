@@ -26,7 +26,7 @@ spec:
         - name: geth
           image: "{{ .image.repository }}:{{ .image.tag }}"
           args:
-            {{- $args := concat .args (printf "--%s" .network | list) (list "--datadir" .datadir) (list "--metrics.port" .ports.metrics) (list "--http.vhosts" $root.Release.Name)}}
+            {{- $args := concat .args (printf "--%s" .network | list) (printf "--metrics.port=%s" .ports.metrics | list) (list "--datadir" .datadir) (list "--http.vhosts" $root.Release.Name)}}
             {{- toYaml $args | nindent 12 }}
           resources: 
             {{- toYaml .resources | nindent 12 }}
