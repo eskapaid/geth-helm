@@ -30,10 +30,6 @@ spec:
             {{- toYaml $args | nindent 12 }}
           resources: 
             {{- toYaml .resources | nindent 12 }}
-          livenessProbe:
-            {{- toYaml .livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .readinessProbe | nindent 12 }}
           volumeMounts:
             - name: data
               mountPath: {{ .datadir }}
